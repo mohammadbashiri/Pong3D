@@ -25,19 +25,25 @@ bat_position = (-4, 0, -7)
 bat = obj_reader.get_mesh("Cube", position = bat_position, scale= .5)
 bat.uniforms['diffuse'] = 0.6, 0, 0
 
+# Add the "bat"
+bat2_position = (4, 0, -7)
+bat2 = obj_reader.get_mesh("Cube", position = bat2_position, scale= .5)
+bat2.uniforms['diffuse'] = 0.6, 0, 0
+
 # Add the ball
 # initialize the movement of the ball
-ball_position = (np.random.randint(bat_position[1]+1,3), np.random.randint(-4,4), -7)
+ball_position = (np.random.randint(bat_position[1]+1,3), np.random.randint(-3.5,3.5), -7)
 ball = obj_reader.get_mesh("Sphere", position = ball_position, scale= .1)
 ball.uniforms['diffuse'] = 1, 1, 1
 
 ball_angle = np.random.randint(150,210)
 print(ball_angle, sind(ball_angle))
+ball_speed = 5
 
 ball_sound = pyglet.media.load('PPB.wav', streaming=False)
 
 # Create Scene
-scene = rc.Scene(meshes=[ball, bat])
+scene = rc.Scene(meshes=[ball, bat, bat2])
 scene.bgColor = 0, 0, 0.2 # set the background of thee scene
 # scene.light.position.xyz = 0, 0, -9
 scene.camera = rc.Camera(position=(0, 0, 0), rotation=(0, 0, 0))
@@ -69,7 +75,7 @@ def checkBounce(ballPos, ballRadius, batPos, batDim):
 
     # right side (x is +ve)
     if ((ballPos[1] - ballRadius) < boundaryY[0]) and ((ballPos[1] + ballRadius) > boundaryY[1]) and batPos[0] > ballPos[0]:
-        if (ballPos[0] - ballRadius) > boundaryX[0]:
+        if (ballPos[0] + ballRadius) > boundaryX[0]:
             result[1] = 0
 
     elif (ballPos[0] + ballRadius) > 5:
@@ -86,9 +92,10 @@ def checkBounce(ballPos, ballRadius, batPos, batDim):
     return result
 
 def ball_update(dt):
-    ball_speed = 10
+    global ball_speed
 
     result = checkBounce(ball.position.xyz, .1, bat.position.xyz, 1)
+    # result = checkBounce(ball.position.xyz, .1, bat2.position.xyz, 1)
 
     global ball_angle
     if result[0]==0:
@@ -107,12 +114,39 @@ def ball_update(dt):
         ball_angle = 360 - ball_angle
         ball_sound.play()
 
-
-    print(ball_angle)
+    # print(ball_angle)
     ball.position.x += ball_speed * cosd(ball_angle) * dt
     ball.position.y += ball_speed * sind(ball_angle) * dt
 
 pyglet.clock.schedule(ball_update)
+
+def ball2_update(dt):
+    global ball_speed
+
+    result = checkBounce(ball.position.xyz, .1, bat2.position.xyz, 1)
+
+    global ball_angle
+    if result[0]==0:
+        ball_angle = 180 - ball_angle
+        ball_sound.play()
+
+    if result[1]==0:
+        ball_angle = 180 - ball_angle
+        ball_sound.play()
+
+    if result[2]==0:
+        ball_angle = 360 - ball_angle
+        ball_sound.play()
+
+    if result[3]==0:
+        ball_angle = 360 - ball_angle
+        ball_sound.play()
+
+    # print(ball_angle)
+    ball.position.x += ball_speed * cosd(ball_angle) * dt
+    ball.position.y += ball_speed * sind(ball_angle) * dt
+
+pyglet.clock.schedule(ball2_update)
 
 def bat_update(dt):
     bat_speed = 10
@@ -128,9 +162,19 @@ def bat_update(dt):
 
 pyglet.clock.schedule(bat_update)
 
+def bat2_update(dt):
+    bat2_speed = 10
 
+    if keys[key.LEFT]:
+        bat2.position.x -= bat2_speed * dt
+    if keys[key.RIGHT]:
+        bat2.position.x += bat2_speed * dt
+    if keys[key.UP]:
+        bat2.position.y += bat2_speed * dt
+    if keys[key.DOWN]:
+        bat2.position.y -= bat2_speed * dt
 
-
+pyglet.clock.schedule(bat2_update)
 
 
 shader = rc.Shader.from_file(*rc.resources.genShader)
