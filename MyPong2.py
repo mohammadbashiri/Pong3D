@@ -12,20 +12,21 @@ obj_filename = rc.resources.obj_primitives # this is the path to the obj_primiti
 obj_reader   = rc.WavefrontReader(obj_filename) # using the WavefrontReader read the .obj file
 
 # Create Mesh
-ball = obj_reader.get_mesh("Sphere", position = (0, 0.5, -3),     scale=.2)
+ball = obj_reader.get_mesh("Sphere", position = (0, 0, -3),     scale=.2)
+ball.uniforms['diffuse'] = 1, 0, 0
 # torus  = obj_reader.get_mesh("Torus",  position = (0, 0.5, -3),     scale=.6, rotation=(1, 90, 0))
-cube   = obj_reader.get_mesh("Cube",   position = (0, -1, -3),    scale=.6)
+# cube   = obj_reader.get_mesh("Cube",   position = (0, -1, -3),    scale=.6)
 
 # Create Scene
-scene = rc.Scene(meshes=[ball, cube])
-scene.bgColor = 0.5, 0.5, 0 # set the background of thee scene
+scene = rc.Scene(meshes=[ball])
+scene.bgColor = 0, 0, 0.2 # set the background of thee scene
 
 # Functions to Run in Event Loop
 # this function runs between each frame, so you will se the updated image in each frame
 def rotate_meshes(dt):
     ball.rotation.y += 15 * dt  # dt is the time between frames
     # torus.rotation.y  += 500 * dt
-    cube.rotation.y   -= 200 * dt
+    # cube.rotation.y   -= 200 * dt
 
 pyglet.clock.schedule(rotate_meshes)
 
