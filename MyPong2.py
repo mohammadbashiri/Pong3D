@@ -19,7 +19,6 @@ window.push_handlers(keys)
 obj_filename = rc.resources.obj_primitives # this is the path to the obj_primitives .obj file
 obj_reader   = rc.WavefrontReader(obj_filename) # using the WavefrontReader read the .obj file
 
-
 # Add the "bat"
 bat_position = (-4, 0, -7)
 bat = obj_reader.get_mesh("Cube", position = bat_position, scale= .5)
@@ -95,7 +94,7 @@ def ball_update(dt):
     global ball_speed
 
     result = checkBounce(ball.position.xyz, .1, bat.position.xyz, 1)
-    # result = checkBounce(ball.position.xyz, .1, bat2.position.xyz, 1)
+    # result = checkBounce(ball.position.xyz, .1, bat2.position.xyz, 1
 
     global ball_angle
     if result[0]==0:
