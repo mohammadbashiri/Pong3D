@@ -1,7 +1,14 @@
 import pyglet
-import random
+import numpy as np
 from pyglet.window import key
 import ratcave as rc
+
+
+def sind(angle):
+    return np.sin(angle*np.pi/180)
+
+def cosd(angle):
+    return np.cos(angle*np.pi/180)
 
 # Create Window and Add Keyboard State Handler to it's Event Loop
 window = pyglet.window.Window(resizable=True)
@@ -20,10 +27,12 @@ bat.uniforms['diffuse'] = 0.6, 0.6, 0.6
 
 # Add the ball
 # initialize the movement of the ball
-
-ball_position = (random.randint(bat_position[1]+1,3), random.randint(-4,4), -7)
+ball_position = (np.random.randint(bat_position[1]+1,3), np.random.randint(-4,4), -7)
 ball = obj_reader.get_mesh("Sphere", position = ball_position, scale= .1)
 ball.uniforms['diffuse'] = 1, 0, 0
+
+ball_angle = np.random.randint(150,210)
+print(ball_angle, sind(ball_angle))
 
 
 
@@ -55,8 +64,8 @@ def checkBounce(ballPos, ballRadius, batPos, batDim):
         if (ballPos[0] - ballRadius) < boundaryX:
             result[0] = 0
 
-    # elif (ballPos[0] - ballRadius) < -5:
-    #     result[0] = 0
+    elif (ballPos[0] - ballRadius) < -5:
+        result[0] = 0
 
     # right side (x is +ve)
     if (ballPos[0] + ballRadius) > 5:
@@ -73,22 +82,27 @@ def checkBounce(ballPos, ballRadius, batPos, batDim):
     return result
 
 def ball_update(dt):
-    ball_speed = 5
+    ball_speed = 10
 
     result = checkBounce(ball.position.xyz, .1, bat.position.xyz, 1)
 
-    if keys[key.LEFT] and result[0]:
-        print(ball.position.xyz, result)
-        ball.position.x -= ball_speed * dt
-    if keys[key.RIGHT] and result[1]:
-        print(ball.position.xyz, result)
-        ball.position.x += ball_speed * dt
-    if keys[key.UP] and result[2]:
-        print(ball.position.xyz, result)
-        ball.position.y += ball_speed * dt
-    if keys[key.DOWN] and result[3]:
-        print(ball.position.xyz, result)
-        ball.position.y -= ball_speed * dt
+    global ball_angle
+    if result[0]==0:
+        ball_angle = 180 - ball_angle
+
+    if result[1]==0:
+        ball_angle = 180 - ball_angle
+
+    if result[2]==0:
+        ball_angle = 360 - ball_angle
+
+    if result[3]==0:
+        ball_angle = 360 - ball_angle
+
+
+    print(ball_angle)
+    ball.position.x += ball_speed * cosd(ball_angle) * dt
+    ball.position.y += ball_speed * sind(ball_angle) * dt
 
 pyglet.clock.schedule(ball_update)
 
