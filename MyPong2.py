@@ -23,18 +23,18 @@ obj_reader   = rc.WavefrontReader(obj_filename) # using the WavefrontReader read
 # Add the "bat"
 bat_position = (-4, 0, -7)
 bat = obj_reader.get_mesh("Cube", position = bat_position, scale= .5)
-bat.uniforms['diffuse'] = 0.6, 0.6, 0.6
+bat.uniforms['diffuse'] = 0.6, 0, 0
 
 # Add the ball
 # initialize the movement of the ball
 ball_position = (np.random.randint(bat_position[1]+1,3), np.random.randint(-4,4), -7)
 ball = obj_reader.get_mesh("Sphere", position = ball_position, scale= .1)
-ball.uniforms['diffuse'] = 1, 0, 0
+ball.uniforms['diffuse'] = 1, 1, 1
 
 ball_angle = np.random.randint(150,210)
 print(ball_angle, sind(ball_angle))
 
-
+ball_sound = pyglet.media.load('PPB.wav', streaming=False)
 
 # Create Scene
 scene = rc.Scene(meshes=[ball, bat])
@@ -58,17 +58,21 @@ def checkBounce(ballPos, ballRadius, batPos, batDim):
     result = [1, 1, 1, 1] # left, right, up, down
 
     # left side (x is -ve)
-    boundaryX = batPos[0] + batDim/2
+    boundaryX = (batPos[0] - batDim/2, batPos[0] + batDim/2) # (left, right)
     boundaryY = (batPos[1] + batDim/2, batPos[1] - batDim/2) # (upper boundary, lower boundary)
-    if ((ballPos[1] - ballRadius) < boundaryY[0]) and ((ballPos[1] + ballRadius) > boundaryY[1]):
-        if (ballPos[0] - ballRadius) < boundaryX:
+    if ((ballPos[1] - ballRadius) < boundaryY[0]) and ((ballPos[1] + ballRadius) > boundaryY[1]) and batPos[0] < ballPos[0]:
+        if (ballPos[0] - ballRadius) < boundaryX[1]:
             result[0] = 0
 
     elif (ballPos[0] - ballRadius) < -5:
         result[0] = 0
 
     # right side (x is +ve)
-    if (ballPos[0] + ballRadius) > 5:
+    if ((ballPos[1] - ballRadius) < boundaryY[0]) and ((ballPos[1] + ballRadius) > boundaryY[1]) and batPos[0] > ballPos[0]:
+        if (ballPos[0] - ballRadius) > boundaryX[0]:
+            result[1] = 0
+
+    elif (ballPos[0] + ballRadius) > 5:
         result[1] = 0
 
     # upper side (y is +ve)
@@ -89,15 +93,19 @@ def ball_update(dt):
     global ball_angle
     if result[0]==0:
         ball_angle = 180 - ball_angle
+        ball_sound.play()
 
     if result[1]==0:
         ball_angle = 180 - ball_angle
+        ball_sound.play()
 
     if result[2]==0:
         ball_angle = 360 - ball_angle
+        ball_sound.play()
 
     if result[3]==0:
         ball_angle = 360 - ball_angle
+        ball_sound.play()
 
 
     print(ball_angle)
