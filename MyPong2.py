@@ -2,8 +2,7 @@ import pyglet
 import numpy as np
 from pyglet.window import key
 import ratcave as rc
-from bat import Bat
-from ball import Ball
+from geometry import Bat, Ball
 
 
 def sind(angle):
