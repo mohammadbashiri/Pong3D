@@ -2,6 +2,7 @@ import pyglet
 import numpy as np
 from pyglet.window import key
 import ratcave as rc
+from geometry import Bat, Ball
 
 
 def sind(angle):
@@ -11,7 +12,7 @@ def cosd(angle):
     return np.cos(angle*np.pi/180)
 
 # Create Window and Add Keyboard State Handler to it's Event Loop
-window = pyglet.window.Window(resizable=True)
+window = pyglet.window.Window(resizable=True, fullscreen=False)
 keys = key.KeyStateHandler()
 window.push_handlers(keys)
 
@@ -20,32 +21,26 @@ obj_filename = rc.resources.obj_primitives # this is the path to the obj_primiti
 obj_reader   = rc.WavefrontReader(obj_filename) # using the WavefrontReader read the .obj file
 
 # Add the "bat"
-bat_position = (-4, 0, -7)
-bat = obj_reader.get_mesh("Cube", position = bat_position, scale= .5)
-bat.uniforms['diffuse'] = 0.6, 0, 0
-
-# Add the "bat"
-bat2_position = (4, 0, -7)
-bat2 = obj_reader.get_mesh("Cube", position = bat2_position, scale= .5)
-bat2.uniforms['diffuse'] = 0.6, 0, 0
+bat = Bat(x=-4, y=0, color=(0.6, 0, 0))
+bat2 = Bat(x=4, y=0, color=(0.6, 0, 0))
 
 # Add the ball
 # initialize the movement of the ball
-ball_position = (np.random.randint(bat_position[1]+1,3), np.random.randint(-3.5,3.5), -7)
-ball = obj_reader.get_mesh("Sphere", position = ball_position, scale= .1)
-ball.uniforms['diffuse'] = 1, 1, 1
+x = np.random.random() * 6 - 3
+y = np.random.randint(-3, 3)
+angle = np.random.randint(150,210)
+ball = Ball(x=x, y=y, color=(0.6, 0, 0), angle=angle)
 
-ball_angle = np.random.randint(150,210)
-print(ball_angle, sind(ball_angle))
-ball_speed = 5
 
-ball_sound = pyglet.media.load('PPB.wav', streaming=False)
+print(ball.angle, sind(ball.angle))
+
+#ball_sound = pyglet.media.load('PPB.wav', streaming=False)
 
 # Create Scene
-scene = rc.Scene(meshes=[ball, bat, bat2])
+scene = rc.Scene(meshes=[ball.mesh, bat.mesh, bat2.mesh])
 scene.bgColor = 0, 0, 0.2 # set the background of thee scene
 # scene.light.position.xyz = 0, 0, -9
-scene.camera = rc.Camera(position=(0, 0, 0), rotation=(0, 0, 0))
+scene.camera = rc.Camera(position=(0, 0, 2), rotation=(0, 0, 0))
 scene.camera.projection.z_far = 10
 
 '''
@@ -90,91 +85,40 @@ def checkBounce(ballPos, ballRadius, batPos, batDim):
 
     return result
 
-def ball_update(dt):
-    global ball_speed
+def ball_bounce(dt):
 
-    result = checkBounce(ball.position.xyz, .1, bat.position.xyz, 1)
-    # result = checkBounce(ball.position.xyz, .1, bat2.position.xyz, 1
+    for bb in [bat, bat2]:
+        result = checkBounce(ball.xyz, .1, bb.xyz, 1)
 
-    global ball_angle
-    if result[0]==0:
-        ball_angle = 180 - ball_angle
-        ball_sound.play()
+        if result[0] == 0 or result[1] == 0:
+            ball.bounce(True)
+        if result[2] == 0 or result[3] == 0:
+            ball.bounce(False)
 
-    if result[1]==0:
-        ball_angle = 180 - ball_angle
-        ball_sound.play()
+pyglet.clock.schedule(ball_bounce)
 
-    if result[2]==0:
-        ball_angle = 360 - ball_angle
-        ball_sound.play()
 
-    if result[3]==0:
-        ball_angle = 360 - ball_angle
-        ball_sound.play()
-
-    # print(ball_angle)
-    ball.position.x += ball_speed * cosd(ball_angle) * dt
-    ball.position.y += ball_speed * sind(ball_angle) * dt
-
-pyglet.clock.schedule(ball_update)
-
-def ball2_update(dt):
-    global ball_speed
-
-    result = checkBounce(ball.position.xyz, .1, bat2.position.xyz, 1)
-
-    global ball_angle
-    if result[0]==0:
-        ball_angle = 180 - ball_angle
-        ball_sound.play()
-
-    if result[1]==0:
-        ball_angle = 180 - ball_angle
-        ball_sound.play()
-
-    if result[2]==0:
-        ball_angle = 360 - ball_angle
-        ball_sound.play()
-
-    if result[3]==0:
-        ball_angle = 360 - ball_angle
-        ball_sound.play()
-
-    # print(ball_angle)
-    ball.position.x += ball_speed * cosd(ball_angle) * dt
-    ball.position.y += ball_speed * sind(ball_angle) * dt
-
-pyglet.clock.schedule(ball2_update)
-
-def bat_update(dt):
-    bat_speed = 10
-
+def check_keyboard(dt):
     if keys[key.A]:
-        bat.position.x -= bat_speed * dt
+        bat.x -= bat.speed * dt
     if keys[key.D]:
-        bat.position.x += bat_speed * dt
+        bat.x += bat.speed * dt
     if keys[key.W]:
-        bat.position.y += bat_speed * dt
+        bat.y += bat.speed * dt
     if keys[key.S]:
-        bat.position.y -= bat_speed * dt
-
-pyglet.clock.schedule(bat_update)
-
-def bat2_update(dt):
-    bat2_speed = 10
-
+        bat.y -= bat.speed * dt
     if keys[key.LEFT]:
-        bat2.position.x -= bat2_speed * dt
+        bat2.x -= bat2.speed * dt
     if keys[key.RIGHT]:
-        bat2.position.x += bat2_speed * dt
+        bat2.x += bat2.speed * dt
     if keys[key.UP]:
-        bat2.position.y += bat2_speed * dt
+        bat2.y += bat2.speed * dt
     if keys[key.DOWN]:
-        bat2.position.y -= bat2_speed * dt
+        bat2.y -= bat2.speed * dt
+    if keys[key.SPACE]:
+        globals()['ball'] = Ball(x, y, color=(0.6, 0, 0), angle=angle)
 
-pyglet.clock.schedule(bat2_update)
-
+pyglet.clock.schedule(check_keyboard)
 
 shader = rc.Shader.from_file(*rc.resources.genShader)
 
