@@ -6,14 +6,18 @@ from geometry import Bat, Ball
 from os.path import dirname, split, isdir
 
 # Create Window and Add Keyboard State Handler to its Event Loop
-window = pyglet.window.Window(resizable=True)
+window = pyglet.window.Window(resizable=True, fullscreen=True)
 keys = key.KeyStateHandler()
 window.push_handlers(keys)
 
 # add the arena
-path_arena = r"D:\TUM\Work\Sirota\My Models\arena\arenaj2.obj"
-print(split(path_arena))
+# path_arena = r"D:\TUM\Work\Sirota\Codes\Tutorials\ratCave\wm2.obj"
+path_arena = r"D:\TUM\Work\Sirota\My Models\arena\arenaj3.obj"
+object = rc.WavefrontReader(path_arena)
+arena = object.get_mesh('Arena', position=(0, 0, -2), rotation=(90, 90, 0), scale=0.5)
 
+# how does the rotation work?
+# rotation = (x, y, z) =>
 
 # Add the bats
 bat1_control_keys = (key.A, key.D, key.W, key.S)
@@ -28,7 +32,7 @@ angle = np.random.randint(150, 210)
 ball1 = Ball(x=x, y=y, angle=angle, color=(1, 1, 1), speed=5, sound_path='PPB.wav')
 
 # Create Scene
-scene = rc.Scene(meshes=[ball1.mesh, bat1.mesh, bat2.mesh])
+scene = rc.Scene(meshes=[ball1.mesh, bat1.mesh, bat2.mesh, arena])
 scene.bgColor = 0, 0, 0.2  # set the background of thee scene
 scene.camera = rc.Camera(position=(0, 0, 0), rotation=(0, 0, 0))
 scene.camera.projection.z_far = 10
