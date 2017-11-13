@@ -99,7 +99,7 @@ class Ball(Geometry):
 
         self.angle = angle
         self.speed = speed
-        self.sound = pyglet.media.load(sound_path, streaming=False)
+        # self.sound = pyglet.media.load(sound_path, streaming=False)
 
         # change the size in any dimension
         self.mesh.arrays[0][:, 0:3] *= scale
@@ -111,11 +111,11 @@ class Ball(Geometry):
 
         if result[0] or result[1]:
             self.angle = 180 - self.angle + result[4] + result[5]
-            self.sound.play()
+            # self.sound.play()
 
         if result[2] or result[3]:
             self.angle = 360 - self.angle
-            self.sound.play()
+            # self.sound.play()
 
         # print(ball_angle)
         self.x += self.speed * cosd(self.angle) * dt
