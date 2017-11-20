@@ -13,13 +13,14 @@ obj_reader = rc.WavefrontReader(obj_filename)
 
 class Geometry(object):
 
-    def __init__(self, mesh, x, y, speed=0, scale=1, color=(1, 1, 1)):
+    def __init__(self, mesh, x, y, z, speed=0, scale=1, color=(1, 1, 1)):
 
         self.mesh = obj_reader.get_mesh(mesh, position=(0, 0, -7), scale=scale)
         self.mesh.uniforms['diffuse'] = color
         self.speed = speed
         self.x = x
         self.y = y
+        self.z = z
 
     @property
     def x(self):
@@ -40,14 +41,23 @@ class Geometry(object):
         self.mesh.position.y = val
 
     @property
+    def z(self):
+        return self._z
+
+    @z.setter
+    def z(self, val):
+        self._z = val
+        self.mesh.position.z = val
+
+    @property
     def xyz(self):
         return tuple(self.mesh.position.xyz)
 
 
 class Bat(Geometry):
 
-    def __init__(self, x, y, color=(1, 1, 1), scale=0.5, speed=10, control_keys=None):
-        super().__init__(mesh="Cube", x=x, y=y, color=color, scale=1, speed=speed)
+    def __init__(self, x, y, z, color=(1, 1, 1), scale=0.5, speed=10, control_keys=None):
+        super().__init__(mesh="Cube", x=x, y=y, z=z, color=color, scale=1, speed=speed)
 
         self.control_keys = control_keys
 
@@ -94,8 +104,8 @@ class Bat(Geometry):
 
 class Ball(Geometry):
 
-    def __init__(self, x, y, angle, color=(1, 1, 1), scale=0.1, speed=10, sound_path=None):
-        super().__init__(mesh="Sphere", x=x, y=y, color=color, scale=1, speed=speed)
+    def __init__(self, x, y, z, angle, color=(1, 1, 1), scale=0.1, speed=10, sound_path=None):
+        super().__init__(mesh="Sphere", x=x, y=y, z=z, color=color, scale=1, speed=speed)
 
         self.angle = angle
         self.speed = speed
