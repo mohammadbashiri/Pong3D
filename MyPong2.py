@@ -12,12 +12,12 @@ window.push_handlers(keys)
 
 # add the arena
 # path_arena = r"D:\TUM\Work\Sirota\Codes\Tutorials\ratCave\wm2.obj"
-path_arena = r"D:\TUM\Work\Sirota\My Models\arena\arenaj3.obj"
+path_arena = r"D:\TUM\Work\Sirota\MyModels\arena\myArena\MyArena1.obj"
 object = rc.WavefrontReader(path_arena)
-arena = object.get_mesh('Arena', position=(0, 0, -2), rotation=(90, 90, 0), scale=0.5)
+arena = object.get_mesh('Arena', position=(0, 0, -3), rotation=(90, 0, 0), scale=1)
 
 # how does the rotation work?
-# rotation = (x, y, z) =>
+# rotation = (x, y, z) => rotation in x, y, and z direction.. all values are in degrees
 
 # Add the bats
 bat1_control_keys = (key.A, key.D, key.W, key.S)
@@ -36,31 +36,31 @@ scene = rc.Scene(meshes=[ball1.mesh, bat1.mesh, bat2.mesh, arena])
 scene.bgColor = 0, 0, 0.2  # set the background of thee scene
 scene.camera = rc.Camera(position=(0, 0, 0), rotation=(0, 0, 0))
 scene.camera.projection.z_far = 10
-# scene.light.position.xyz = 0, 0, -9
+# scene.light.position.xyz = 0, 0, 0
 
 #
-# def update(dt):
-#
-#     for bb in [bat1, bat2]:
-#         # result = did_bounce(ball1.xyz, ball1.radius, bb.xyz, 1)
-#         result = bb.did_bounce(ball1.xyz, ball1.radius, 4, -4)
-#         ball1.update_angle(result, dt)
-#
-#         if keys[bb.control_keys[0]]:
-#             bb.x -= bb.speed * dt
-#         if keys[bb.control_keys[1]]:
-#             bb.x += bb.speed * dt
-#         if keys[bb.control_keys[2]]:
-#             bb.y += bb.speed * dt
-#         if keys[bb.control_keys[3]]:
-#             bb.y -= bb.speed * dt
-#
-#         if keys[key.SPACE] or ball1.xyz[0] < -5 or ball1.xyz[0] > 5:
-#             ball1.x = np.random.randint(bat1.x+1, bat2.x+-1)
-#             ball1.y = np.random.randint(-3, 3)
-#             ball1.angle = np.random.randint(150, 210)
-#
-# pyglet.clock.schedule(update)
+def update(dt):
+
+    for bb in [bat1, bat2]:
+        # result = did_bounce(ball1.xyz, ball1.radius, bb.xyz, 1)
+        result = bb.did_bounce(ball1.xyz, ball1.radius, 4, -4)
+        ball1.update_angle(result, dt)
+
+        if keys[bb.control_keys[0]]:
+            bb.x -= bb.speed * dt
+        if keys[bb.control_keys[1]]:
+            bb.x += bb.speed * dt
+        if keys[bb.control_keys[2]]:
+            bb.y += bb.speed * dt
+        if keys[bb.control_keys[3]]:
+            bb.y -= bb.speed * dt
+
+        if keys[key.SPACE] or ball1.xyz[0] < -5 or ball1.xyz[0] > 5:
+            ball1.x = np.random.randint(bat1.x+1, bat2.x+-1)
+            ball1.y = np.random.randint(-3, 3)
+            ball1.angle = np.random.randint(150, 210)
+
+pyglet.clock.schedule(update)
 shader = rc.Shader.from_file(*rc.resources.genShader)
 
 
