@@ -21,6 +21,7 @@ class Geometry(object):
         self.x = x
         self.y = y
         self.z = z
+        self.xyz = (x, y, z)
 
     @property
     def x(self):
@@ -52,6 +53,10 @@ class Geometry(object):
     @property
     def xyz(self):
         return tuple(self.mesh.position.xyz)
+
+    @xyz.setter
+    def xyz(self, val):
+        self.x, self.y, self.z = val
 
 
 class Bat(Geometry):
