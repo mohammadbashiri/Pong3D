@@ -3,17 +3,22 @@ import numpy as np
 from pyglet.window import key
 import ratcave as rc
 from geometry import Bat, Ball
+import natnetclient as natnet
+
+
+client = natnet.NatClient()
+arenaPhysic = client.rigid_bodies['arenaMotive'] # name of rigid body in Motive
 
 # Create Window and Add Keyboard State Handler to its Event Loop
-window = pyglet.window.Window(resizable=True, fullscreen=True)
+window = pyglet.window.Window(resizable=True, fullscreen=False)
 keys = key.KeyStateHandler()
 window.push_handlers(keys)
 
 # add the arena
-path_arena = r"D:\TUM\Work\Sirota\MyModels\arena\myArena\MyArenaInComp.obj"
+path_arena = r"D:\sirotalab\Mohammad Folder\Models\Arena\MyArenaInComp.obj"
 object = rc.WavefrontReader(path_arena)
 arena_pos = [0, 0, -7]
-arena = object.get_mesh('Arena', position=(arena_pos[0], arena_pos[1], arena_pos[2]), rotation=(90, 0, 0), scale=1)
+arena = object.get_mesh('Arena', position=(arena_pos[0], arena_pos[1], arena_pos[2]), rotation=(90, 0, 0), scale=5)
 
 # Add the bats
 bat1_control_keys = (key.A, key.D, key.W, key.S)
@@ -42,9 +47,14 @@ def update(dt):
 
     # keep track of the changes in the arena position
     global arena_pos_old
+
+    # change arena position with actual arena movement
+    arena.position.x = -arenaPhysic.position[0]*10
+    arena.position.y = arenaPhysic.position[2]*10
+
     arena_pos_change = np.array(list(arena.position.xyz)) - arena_pos_old
     arena_pos_old = arena.position.xyz
-    print(arena_pos_change)
+    print(arenaPhysic.position)
 
     for bb in [bat1, bat2]:
         # result = did_bounce(ball1.xyz, ball1.radius, bb.xyz, 1)
@@ -68,12 +78,6 @@ def update(dt):
         ball1.x = arena.position.x
         ball1.y = arena.position.y + np.random.rand() - 0.5
         ball1.angle = np.random.randint(150, 210)
-
-    # changing arena position
-    if keys[key.C]:
-        arena.position.x += 0.2
-    elif keys[key.V]:
-        arena.position.x -= 0.2
 
     # toggle between camera position for left and right eyes
     # scene.camera.position.x = 0 - scene.camera.position.x
