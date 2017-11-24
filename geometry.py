@@ -47,6 +47,10 @@ class Geometry(object):
     def xyz(self):
         return tuple(self.mesh.position.xyz)
 
+    @xyz.setter
+    def xyz(self, val):
+        self.x, self.y, _ = val
+
 
 class Bat(Geometry):
 
