@@ -8,14 +8,18 @@ def sind(angle):
 def cosd(angle):
     return np.cos(angle*np.pi/180)
 
-obj_filename = rc.resources.obj_primitives
-obj_reader = rc.WavefrontReader(obj_filename)
+# obj_filename = rc.resources.obj_primitives
+# obj_reader = rc.WavefrontReader(obj_filename)
+
+assets_path = r"D:\TUM\Work\Sirota\MyModels\Pong3DAssets\pongAssets.obj"
+obj_reader = rc.WavefrontReader(assets_path)
+
 
 class Geometry(object):
 
-    def __init__(self, mesh, x, y, speed=0, scale=1, color=(1, 1, 1)):
+    def __init__(self, mesh, x, y, speed=0, scale=1, color=(1, 1, 1), *args, **kwargs):
 
-        self.mesh = obj_reader.get_mesh(mesh, position=(0, 0, -7), scale=scale)
+        self.mesh = obj_reader.get_mesh(mesh, position=(0, 0, -1.5), scale=scale, *args, **kwargs)
         self.mesh.uniforms['diffuse'] = color
         self.speed = speed
         self.x = x
@@ -46,15 +50,10 @@ class Geometry(object):
 
 class Bat(Geometry):
 
-    def __init__(self, x, y, color=(1, 1, 1), scale=0.5, speed=10, control_keys=None):
-        super().__init__(mesh="Cube", x=x, y=y, color=color, scale=1, speed=speed)
+    def __init__(self, x, y, color=(1, 1, 1), scale=1, speed=10, control_keys=None, *args, **kwargs):
+        super().__init__(mesh="Bat", x=x, y=y, color=color, scale=scale, speed=speed, *args, **kwargs)
 
         self.control_keys = control_keys
-
-        # change the size of any dimension of the object
-        self.mesh.arrays[0][:, 0:3] *= scale
-        self.mesh.arrays[0][:, 0] *= 0.05  # x-dimension
-        self.mesh.arrays[0][:, 1] *= 1.5  # y-dimension
         self.length_x = 2 * np.mean((abs(np.min(self.mesh.arrays[0][:, 0])), np.max(self.mesh.arrays[0][:, 0])))
         self.length_y = 2 * np.mean((abs(np.min(self.mesh.arrays[0][:, 1])), np.max(self.mesh.arrays[0][:, 1])))
 
@@ -94,8 +93,8 @@ class Bat(Geometry):
 
 class Ball(Geometry):
 
-    def __init__(self, x, y, angle, color=(1, 1, 1), scale=0.1, speed=10, sound_path=None):
-        super().__init__(mesh="Sphere", x=x, y=y, color=color, scale=1, speed=speed)
+    def __init__(self, x, y, angle, color=(1, 1, 1), scale=1, speed=10, sound_path=None, *args, **kwargs):
+        super().__init__(mesh="Ball", x=x, y=y, color=color, scale=scale, speed=speed, *args, **kwargs)
 
         self.angle = angle
         self.speed = speed
